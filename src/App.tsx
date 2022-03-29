@@ -1,14 +1,13 @@
 import React, { Reducer, useEffect, useReducer, useState } from "react";
-import {v4 as uuidv4} from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 /** @jsxImportSource @emotion/react */
 import { css } from "@emotion/react";
 import "./App.css";
-import TaskCard from "./components/TaskCard";
 import List from "./components/List";
 import { Task } from "./types";
 import ControlledModal from "./components/Modal";
 import { useLocalStorage } from "../src/hooks/useLocalStorage";
-import {reducer, ActionType, StateType} from './hooks/reducer';
+import { reducer, ActionType, StateType } from "./hooks/reducer";
 //read/write to json file -> make custom hook ->https://www.pluralsight.com/guides/fetch-data-from-a-json-file-in-a-react-app
 // https://www.linkedin.com/learning/react-design-patterns/usedatasource-hook?autoAdvance=true&autoSkip=true&autoplay=true&contextUrn=urn%3Ali%3AlyndaLearningPath%3A593715e0498e9e9be7fb8506&resume=false&u=94420922
 //state management -useReducer:
@@ -17,7 +16,7 @@ import {reducer, ActionType, StateType} from './hooks/reducer';
 //styling
 //input validation
 //possible to move to different list by button
-
+//add pandas
 //useinput hook
 //input flow
 // possible to delete item
@@ -26,15 +25,23 @@ import {reducer, ActionType, StateType} from './hooks/reducer';
 //add login etc.
 //commit and upload to github
 //button component
-
+const todos: Task[] = [
+  { id: uuidv4(), name: "first task", status: "BACKLOG" },
+  { id: uuidv4(), name: "second task", status: "BACKLOG" },
+  { id: uuidv4(), name: "third task", status: "DOING" },
+  { id: uuidv4(), name: "fourth", status: "DONE" },
+];
 function App() {
   const [input, setInput] = useState("");
   const [shouldShowModal, setShouldShowModal] = useState(false);
   const [tasks, setTasks] = useLocalStorage<Task[]>("tasks", []);
-  const [state, dispatch] = useReducer<Reducer<Task[], ActionType>>(reducer, tasks)
+  const [state, dispatch] = useReducer<Reducer<Task[], ActionType>>(
+    reducer,
+    tasks
+  );
 
   return (
-    <div className="App">
+    <div className="App" >
       <ControlledModal
         shouldShow={shouldShowModal}
         onRequestClose={() => setShouldShowModal(false)}
@@ -50,8 +57,11 @@ function App() {
               ...tasks,
               { id: uuidv4(), name: input, status: "BACKLOG" },
             ]);
-            dispatch({type: 'add', payload:  { id: uuidv4(), name: input, status: "BACKLOG" }});
-            console.log('state', state)
+            dispatch({
+              type: "add",
+              payload: { id: uuidv4(), name: input, status: "BACKLOG" },
+            });
+            console.log("state", state);
             setInput("");
             setShouldShowModal(false);
           }}
@@ -62,45 +72,38 @@ function App() {
       <button onClick={() => setShouldShowModal(!shouldShowModal)}>
         New task
       </button>
-      <List
+      <div css={css`
+      display: grid; 
+      grid-template-columns: repeat(3,1fr);    
+    `}>
+<List
         css={css`
           background-color: lightgrey;
+          padding: 1rem;
         `}
-      >
-        <>
-          {tasks
-            .filter((item) => item.status === "BACKLOG")
-            .map((item) => (
-              <>
-              <TaskCard key={item.id}>{item.name}</TaskCard>
-              <button onClick={()=>dispatch({type: 'delete', payload: {id: item.id, name: item.name, status: item.status}})}>forget about it</button>
-              {console.log('state after delete',state)}
-              </>
-            ))}
-        </>
-      </List>
+        list={todos}
+        listType="BACKLOG"
+      />
       <List
         css={css`
           background-color: pink;
+          padding: 1rem;
         `}
-      >
-        {tasks
-          .filter((item) => item.status === "DOING")
-          .map((item) => (
-            <TaskCard key={item.id}>{item.name}</TaskCard>
-          ))}
-      </List>
+        list={todos}
+        listType="DOING"
+      />
+
       <List
         css={css`
           background-color: yellowgreen;
+          padding: 1rem;
         `}
-      >
-        {tasks
-          .filter((item) => item.status === "DONE")
-          .map((item) => (
-            <TaskCard key={item.id}>{item.name}</TaskCard>
-          ))}
-      </List>
+        list={todos}
+        listType="DONE"
+      />
+
+    </div>
+      
     </div>
   );
 }
