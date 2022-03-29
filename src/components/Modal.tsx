@@ -6,8 +6,7 @@ import { useState } from "react";
 interface ModalProps {
   children: any;
   shouldShow?: boolean;
-  onRequestClose?: ()=>void;
-
+  onRequestClose?: () => void;
 }
 const modalBackgroundStyles = css`
   background-color: rgba(255, 192, 203, 0.5);
@@ -22,8 +21,10 @@ const modalBackgroundStyles = css`
 const modalBody = css`
   background-color: white;
   margin: 10% auto;
-  padding: 20px;
+  padding: 1rem;
   width: 50%;
+  display: grid;
+  grid-template-rows: max-content 1fr;
 `;
 
 const Modal = ({ children }: ModalProps) => {
@@ -35,7 +36,7 @@ const Modal = ({ children }: ModalProps) => {
       {shouldShow && (
         <div css={modalBackgroundStyles} onClick={() => setShouldShow(false)}>
           <div css={modalBody} onClick={(e) => e.stopPropagation()}>
-            <button onClick={() => setShouldShow(false)}>hide me</button>
+            <div onClick={() => setShouldShow(false)}>x</div>
             {children}
           </div>
         </div>
@@ -44,20 +45,31 @@ const Modal = ({ children }: ModalProps) => {
   );
 };
 
-const ControlledModal = ({ children, shouldShow, onRequestClose }: ModalProps) => {
-  
-    return (
-      <>
-        {shouldShow && (
-          <div css={modalBackgroundStyles} onClick={() => onRequestClose}>
-            <div css={modalBody} onClick={(e) => e.stopPropagation()}>
-              <button onClick={onRequestClose}>hide me</button>
-              {children}
+const ControlledModal = ({
+  children,
+  shouldShow,
+  onRequestClose,
+}: ModalProps) => {
+  return (
+    <>
+      {shouldShow && (
+        <div css={modalBackgroundStyles} onClick={() => onRequestClose}>
+          <div css={modalBody} onClick={(e) => e.stopPropagation()}>
+            <div
+              css={css`
+                justify-self: end;
+                cursor: default;
+              `}
+              onClick={onRequestClose}
+            >
+              x
             </div>
+            {children}
           </div>
-        )}
-      </>
-    );
-  };
+        </div>
+      )}
+    </>
+  );
+};
 
 export default ControlledModal;
